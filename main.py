@@ -1,4 +1,4 @@
-from fastmcp import FastMCP  # ❌ Was: from fastmcp import FastMCP
+from fastmcp import FastMCP 
 import random
 
 mcp = FastMCP("simple calculator server")
@@ -25,12 +25,10 @@ def get_random_number(min: int, max: int) -> int:
     """
     return random.randint(min, max)
 
-@mcp.resource("info") # ✅ Need parentheses ()
+
+@mcp.resource("resource://info")
 def server_info() -> dict:
-    """Get server information
-    Returns:
-        A dictionary containing server information
-    """
+    """Get server information"""
     return {
         "name": "simple calculator server",
         "version": "1.0.0",
@@ -43,6 +41,6 @@ if __name__ == "__main__":
 
     mcp.run(
         transport="http",
-        host="[IP_ADDRESS]",
-        port=8000,
+        host="0.0.0.0",
+        port=8081,
     )
