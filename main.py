@@ -3,7 +3,7 @@ import random
 
 mcp = FastMCP("simple calculator server")
 
-@mcp.tool()  # ✅ Need parentheses ()
+@mcp.tool()
 def add(a: int, b: int) -> int:
     """Add two numbers
     Args: 
@@ -14,7 +14,7 @@ def add(a: int, b: int) -> int:
     """
     return a + b
 
-@mcp.tool()  # ✅ Need parentheses ()
+@mcp.tool()
 def get_random_number(min: int, max: int) -> int:
     """Get a random number between min and max
     Args: 
@@ -25,6 +25,87 @@ def get_random_number(min: int, max: int) -> int:
     """
     return random.randint(min, max)
 
+@mcp.tool()
+def create_campaign(campaign_name: str, target_audience: str, tone: str) -> dict:
+    """Create a new outbound campaign
+    Args:
+        campaign_name: Name of the campaign
+        target_audience: Description of the target audience
+        tone: Tone of the campaign (e.g. professional, casual, friendly)
+    Returns:
+        Campaign details including the new campaign_id
+    """
+    import uuid
+    campaign_id = str(uuid.uuid4())[:8]
+    return {
+        "campaign_id": campaign_id,
+        "campaign_name": campaign_name,
+        "target_audience": target_audience,
+        "tone": tone,
+        "status": "created",
+        "message": f"Campaign '{campaign_name}' created successfully."
+    }
+
+@mcp.tool()
+def get_campaign_stats(campaign_id: str) -> dict:
+    """Get statistics for a campaign
+    Args:
+        campaign_id: The ID of the campaign
+    Returns:
+        Campaign statistics including opens, replies, and meetings booked
+    """
+    return {
+        "campaign_id": campaign_id,
+        "opens": random.randint(10, 500),
+        "replies": random.randint(1, 50),
+        "meetings_booked": random.randint(0, 10),
+        "status": "active"
+    }
+
+@mcp.tool()
+def get_recent_replies() -> list:
+    """Get the latest email replies from leads
+    Returns:
+        A list of recent replies with lead_id, sender, and message preview
+    """
+    return [
+        {"lead_id": "lead_001", "sender": "alice@example.com", "preview": "Thanks for reaching out, I'm interested!", "received_at": "2026-04-01T09:00:00Z"},
+        {"lead_id": "lead_002", "sender": "bob@example.com", "preview": "Can we schedule a call this week?", "received_at": "2026-04-01T10:30:00Z"},
+        {"lead_id": "lead_003", "sender": "carol@example.com", "preview": "Please remove me from this list.", "received_at": "2026-04-01T11:00:00Z"},
+    ]
+
+@mcp.tool()
+def send_reply(lead_id: str, message: str) -> dict:
+    """Send a reply to a lead
+    Args:
+        lead_id: The ID of the lead to reply to
+        message: The message to send
+    Returns:
+        Confirmation of the sent reply
+    """
+    return {
+        "lead_id": lead_id,
+        "status": "sent",
+        "message_preview": message[:100],
+        "message": f"Reply sent to lead {lead_id} successfully."
+    }
+
+@mcp.tool()
+def book_meeting(lead_id: str, time_slot: str) -> dict:
+    """Book a meeting with a lead
+    Args:
+        lead_id: The ID of the lead
+        time_slot: Desired time slot (e.g. '2026-04-05 14:00 UTC')
+    Returns:
+        Meeting confirmation details
+    """
+    return {
+        "lead_id": lead_id,
+        "time_slot": time_slot,
+        "status": "booked",
+        "meeting_id": f"mtg_{lead_id}_{random.randint(1000,9999)}",
+        "message": f"Meeting booked with lead {lead_id} at {time_slot}."
+    }
 
 @mcp.resource("resource://info")
 def server_info() -> dict:
@@ -33,12 +114,10 @@ def server_info() -> dict:
         "name": "simple calculator server",
         "version": "1.0.0",
         "description": "A simple calculator server",
-        "tools": ["add", "get_random_number"]
+        "tools": ["add", "get_random_number", "create_campaign", "get_campaign_stats", "get_recent_replies", "send_reply", "book_meeting"]
     }
 
 if __name__ == "__main__":
-    # mcp.run()  # ✅ FastMCP defaults to stdio (remove transport/host/port for local test)
-
     mcp.run(
         transport="http",
         host="0.0.0.0",
